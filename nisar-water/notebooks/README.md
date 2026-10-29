@@ -1,5 +1,16 @@
 # Notebooks
 
+## Public, portable Earthdata notebook
+
+Open [NISAR_Water_Try_Your_Data.ipynb](NISAR_Water_Try_Your_Data.ipynb) in Jupyter
+or [Colab](https://colab.research.google.com/github/Ch0comilo/NISAR-Models/blob/main/nisar-water/notebooks/NISAR_Water_Try_Your_Data.ipynb).
+Each user enters their own Bearer token in a hidden prompt. It performs bounded
+standalone acquisition, inference, temporal comparisons and a local API check.
+The published notebook has no saved outputs or credentials. See
+[the setup guide](../docs/notebook-earthdata.md).
+
+## Original workspace notebooks
+
 The original research workspace retains these executed notebooks locally:
 
 - `NISAR_Water_Improved_Classifier.ipynb`: latest two improvement experiments,

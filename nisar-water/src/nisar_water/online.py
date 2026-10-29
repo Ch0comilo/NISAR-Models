@@ -1,4 +1,4 @@
-"""Bounded live acquisition using the existing protected Earthdata runtime.
+"""Standalone bounded acquisition, with an opt-in legacy research adapter.
 
 Only public metadata and paths enter worker jobs. Authentication remains in the
 existing current-user encrypted credential helper, never in notebook cells.
@@ -19,7 +19,10 @@ def reference_adapter(reference_root):
     return acquisition
 
 
-def discover(aoi, start, end, work_dir, reference_root):
+def discover(aoi, start, end, work_dir, reference_root=None):
+    if reference_root is None:
+        from .live_acquisition import discover as standalone_discover
+        return standalone_discover(aoi, start, end, work_dir)
     adapter = reference_adapter(reference_root)
     work_dir = Path(work_dir).resolve()
     work_dir.mkdir(parents=True, exist_ok=True)
@@ -39,7 +42,10 @@ def discover(aoi, start, end, work_dir, reference_root):
     return result
 
 
-def acquire(candidate, aoi, work_dir, reference_root, max_bytes=128*1024**2, *, halo_metres=None):
+def acquire(candidate, aoi, work_dir, reference_root=None, max_bytes=128*1024**2, *, halo_metres=None):
+    if reference_root is None:
+        from .live_acquisition import acquire as standalone_acquire
+        return standalone_acquire(candidate, aoi, work_dir, max_bytes=max_bytes, halo_metres=halo_metres)
     adapter = reference_adapter(reference_root)
     work_dir = Path(work_dir).resolve()
     work_dir.mkdir(parents=True, exist_ok=True)

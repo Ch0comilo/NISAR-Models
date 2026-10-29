@@ -11,21 +11,28 @@ It contains source, tests, lockfile, architecture/new-data/API guides, a sample
 AOI, a minimal Python worker, the current scientific assessment and three
 portable frozen model directories under `checkpoints/round5/`.
 
-A local Git repository has been initialized on branch `main`. No remote was
-created, no files were committed and nothing was uploaded. Review the candidate
-file list before your first commit:
+The owner supplied the shared repository
+[Ch0comilo/NISAR-Models](https://github.com/Ch0comilo/NISAR-Models), with this
+package inside `nisar-water/`. Preserve that layout when cloning:
+
+```sh
+git clone https://github.com/Ch0comilo/NISAR-Models.git
+cd NISAR-Models/nisar-water
+```
+
+For changes, review the candidate file list and run the checks before committing:
 
 ```sh
 git status --short
 uv run --no-sync python scripts/check_repository.py
 git add .
 git diff --cached --stat
-git commit -m "Add headless NISAR water inference and API contract"
+git commit -m "Describe the concrete change"
 ```
 
-Create the desired empty GitHub repository in your account, then connect it
-using the exact remote URL supplied by GitHub and push `main`. A remote/name
-has deliberately not been invented. Choose the team's intended code/model
+The repository's root README links the public Earthdata-token notebook, and the
+root `.github/workflows/ci.yml` runs checks from this package directory.
+Choose the team's intended code/model
 license before inviting open-source reuse; the current license notice grants
 no additional reuse rights.
 

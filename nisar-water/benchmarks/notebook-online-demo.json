@@ -1,0 +1,77 @@
+{
+  "state": "passed",
+  "scope": "Actual online end-to-end software demonstration; no accuracy claim",
+  "notebook": "notebooks/NISAR_Water_Try_Your_Data.ipynb",
+  "execution": {
+    "state": "passed",
+    "code_cells": 7,
+    "outputs": 15,
+    "errors": 0
+  },
+  "complete_for_compatible_query": true,
+  "radar_body_bytes": 32505872,
+  "series_geometry": {
+    "track": 155,
+    "pass": "A",
+    "frame": 11,
+    "frequency": "A"
+  },
+  "observations": [
+    {
+      "datetime": "2026-10-10T22:29:54Z",
+      "granuleId": "NISAR_L2_PR_GCOV_032_155_A_011_2005_DHDH_A_20261010T222954_20261010T223029_P05023_N_F_J_001",
+      "modelId": "nisar-water-terrain-prior-round5-v1-round5-validation-frozen",
+      "modelSha256": "e80ee5f302f41863e8d721cebb95278b6c4a5de9715088474289043d4154de34",
+      "statistics": {
+        "waterHa": 893.4605671417712,
+        "nonwaterHa": 6582.849294825944,
+        "uncertainHa": 2.9448208022117615,
+        "unobservedHa": 1.9046494483945935,
+        "observedHa": 7479.254682769926,
+        "requestedHa": 7481.159332218322
+      }
+    },
+    {
+      "datetime": "2026-10-22T22:29:55Z",
+      "granuleId": "NISAR_L2_PR_GCOV_033_155_A_011_2005_DHDH_A_20261022T222955_20261022T223029_P05023_N_F_J_001",
+      "modelId": "nisar-water-terrain-prior-round5-v1-round5-validation-frozen",
+      "modelSha256": "e80ee5f302f41863e8d721cebb95278b6c4a5de9715088474289043d4154de34",
+      "statistics": {
+        "waterHa": 964.8725936901568,
+        "nonwaterHa": 6511.437268277558,
+        "uncertainHa": 2.9448208022117615,
+        "unobservedHa": 1.9046494483945935,
+        "observedHa": 7479.254682769926,
+        "requestedHa": 7481.159332218322
+      }
+    }
+  ],
+  "comparable_timeline": [
+    {
+      "datetime": "2026-10-10T22:29:54Z",
+      "commonAllDatesHa": 7476.069694862319,
+      "waterOnCommonAllDatesHa": 893.4605471687391
+    },
+    {
+      "datetime": "2026-10-22T22:29:55Z",
+      "commonAllDatesHa": 7476.069694862319,
+      "waterOnCommonAllDatesHa": 964.8725721212104
+    }
+  ],
+  "checks": [
+    "COG layout",
+    "native raster alignment",
+    "finite classified scores",
+    "observed/unknown/invalid area partition",
+    "vector/raster area equality",
+    "RGBA transparency",
+    "all asset hashes",
+    "all HTTP asset routes",
+    "actual localhost API readiness and PNG SHA256"
+  ],
+  "credential_copied_or_logged": false,
+  "published_notebook_outputs_cleared": true,
+  "checkpoint_changed": false,
+  "model_readiness": "not_ready_for_general_use",
+  "colab_ui_execution_tested": false
+}

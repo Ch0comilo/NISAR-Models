@@ -199,11 +199,13 @@ model. Their optional Torch/GDAL/vendor environments are not required for HGB
 inference. The crop adapter does not claim to produce a DAAC-validated OPERA
 product.
 
-The research `aoi` command discovers and processes compatible observations
-without an optical-cloud filter, with explicit transfer limits and separate
-geometry groups. Its current acquisition implementation still imports the
-sibling `nisar-landcover-phase1` adapter, which also uses `nisar-models` runtime
-and protected Earthdata helpers. This online radar acquisition path is not
-standalone in a minimal clone. Local HDF5/NetCDF/crop inference and public
-terrain-context fetching do not require those sibling projects. Package or
-replace that acquisition adapter before advertising a standalone online API.
+The `aoi` command discovers and processes compatible observations without an
+optical-cloud filter, with explicit transfer limits and separate geometry groups.
+Its default reader is now standalone: `live_acquisition.py` verifies public CMR
+metadata, `earthdata.py` restricts in-memory Bearer authentication and exact byte
+ranges, and `remote_gcov.py` reads bounded HDF5 windows and verifies native
+identity/grid/masks. The new public notebook demonstrates this path using each
+user's own token. No sibling projects or protected Windows helper are required
+by that notebook. Explicit `--reference-root` retains the historical adapter.
+The read-only HTTP service still needs a future job wrapper for online inference
+submission; standalone CLI acquisition does not add a POST endpoint.

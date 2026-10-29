@@ -36,8 +36,10 @@ can point outside the served root and does not expose other files beside it.
 The explicit assessment takes precedence over an older root assessment.
 
 No POST inference or upload route exists. No endpoint automatically downloads
-the NISAR archive. The historical `aoi` CLI still depends on the original sibling
-acquisition projects and must be packaged/replaced for standalone online jobs.
+the NISAR archive. The `aoi` CLI now uses the standalone bounded Earthdata reader
+by default. A future job worker can provide the user's/server's credential in
+memory or `EARTHDATA_TOKEN`; the public notebook demonstrates this path without
+requiring sibling projects. The older adapter requires `--reference-root`.
 
 ## Frontend consumption
 

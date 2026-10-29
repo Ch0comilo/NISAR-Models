@@ -24,7 +24,7 @@ def main(argv=None):
     archive.add_argument('input',type=Path,help='WGS84 GeoJSON polygon or feature')
     archive.add_argument('--start',required=True);archive.add_argument('--end',required=True)
     archive.add_argument('--model',type=Path,required=True);archive.add_argument('--output',type=Path,required=True)
-    archive.add_argument('--reference-root',type=Path,default=Path(__file__).resolve().parents[3]/'nisar-landcover-phase1')
+    archive.add_argument('--reference-root',type=Path,help='Optional legacy research adapter; omitted uses the standalone Earthdata reader')
     archive.add_argument('--transfer-cap-mib',type=int,default=1024)
     archive.add_argument('--limit',type=int,default=0,help='0 processes all compatible dates; a positive cap explicitly marks a partial run')
     archive.add_argument('--context-cache',type=Path,help='Explicitly enable bounded public terrain/prior fetching into this cache for new AOIs')

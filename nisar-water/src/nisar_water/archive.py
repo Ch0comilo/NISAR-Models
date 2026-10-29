@@ -43,7 +43,7 @@ def all_candidates(aoi,start,end,work,reference_root):
         'revision_rule':'Highest CMR revision, then lexical granule identity per exact acquisition time and geometry'}
 
 
-def process_aoi(aoi,start,end,model_dir,output,reference_root,*,transfer_cap_bytes=1024**3,limit=0,context_cache_dir=None):
+def process_aoi(aoi,start,end,model_dir,output,reference_root=None,*,transfer_cap_bytes=1024**3,limit=0,context_cache_dir=None):
     output=Path(output).resolve();output.mkdir(parents=True,exist_ok=True)
     model=load_model(model_dir) if context_cache_dir is None else load_model(model_dir,context_cache_dir=context_cache_dir)
     if aoi.get('type')=='Feature':aoi=aoi['geometry']

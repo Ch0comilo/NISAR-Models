@@ -4,6 +4,7 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .pytest-work/
+.pytest-*/
 .cache/
 .ruff_cache/
 *.egg-info/
@@ -21,7 +22,9 @@ htmlcov/
 /review/
 /vendor/
 /notebooks/*.ipynb
+!/notebooks/NISAR_Water_Try_Your_Data.ipynb
 /repository-ready.zip
+/repository-ready/
 
 # Authentication and machine-local configuration
 .env

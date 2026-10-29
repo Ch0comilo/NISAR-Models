@@ -10,6 +10,20 @@ result service. No frontend is required.
 the models still miss difficult reservoir water. Reported scores use automated
 optical weak references, not independent expert shoreline truth.
 
+## Try it with your own Earthdata token
+
+[Open in Colab](https://colab.research.google.com/github/Ch0comilo/NISAR-Models/blob/main/nisar-water/notebooks/NISAR_Water_Try_Your_Data.ipynb)
+or open [the public notebook](notebooks/NISAR_Water_Try_Your_Data.ipynb) locally.
+It accepts your own Bearer token through a hidden prompt, acquires bounded real
+NISAR crops without sibling projects, displays water/borders and temporal
+support, and checks the saved-result HTTP API. It does not save credentials.
+See [the Spanish notebook guide](docs/notebook-earthdata.md).
+
+```sh
+uv sync --frozen --extra notebook
+uv run --no-sync jupyter lab notebooks/NISAR_Water_Try_Your_Data.ipynb
+```
+
 ## Start in this folder
 
 This directory is the repository root. On the original development computer:
@@ -123,9 +137,11 @@ uv run --frozen nisar-water netcdf /path/to/water-input.nc --model checkpoints/r
 
 [Testing new observations](docs/testing-new-data.md) covers the complete input
 contract, Python worker, catalog input, temporal comparison and error diagnosis.
-The research `aoi` archive-download command still needs the earlier sibling
-acquisition projects. It is **not** a standalone fresh-clone radar downloader.
-Local inference and public terrain fetching are standalone.
+The `aoi` command now has a standalone bounded CMR/Earthdata reader. The public
+notebook supplies the user's token in memory; automated callers can set
+`EARTHDATA_TOKEN` in the worker environment. No full-granule fallback exists.
+`--reference-root` explicitly selects the older research adapter when needed;
+it is not required by the new default reader.
 
 ## API integration
 
@@ -222,8 +238,9 @@ files are intentionally versioned separately under `checkpoints/`.
 
 No code/checkpoint license has been selected on the owner's behalf. See
 [LICENSE](LICENSE) and [third-party notices](THIRD_PARTY_NOTICES.md). Choose the
-team's intended license before offering open-source reuse. Preparing this
-repository does not publish it or create a remote GitHub repository.
+team's intended license before offering open-source reuse. The shared GitHub
+repository is [Ch0comilo/NISAR-Models](https://github.com/Ch0comilo/NISAR-Models);
+this package is its `nisar-water/` subdirectory.
 
-See [the GitHub handoff](docs/repository-handoff.md) for the initial commit,
-repository archive and upload steps.
+See [the GitHub handoff](docs/repository-handoff.md) for cloning, repository
+layout and archive guidance.

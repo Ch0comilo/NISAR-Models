@@ -165,7 +165,7 @@ geometries. Extent change does not establish a human cause.
 | All/large unknown area | Context availability, feature support and exclusions |
 | Blank water with classified land | Actual model decision; inspect known failure modes |
 | Output already exists | Choose a fresh output directory |
-| Acquisition modules missing in `aoi` | That research downloader needs sibling projects; use local HDF5 |
+| Authentication/access error in `aoi` | Use your own valid Earthdata token and required agreements; see the public notebook |
 
 For software verification only, run the synthetic smoke check from the README.
 For accuracy, obtain independent reviewed polygons and score water recall,

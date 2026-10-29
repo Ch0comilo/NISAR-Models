@@ -1,0 +1,26 @@
+name: NISAR software and frozen-model checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+defaults:
+  run:
+    working-directory: nisar-water
+jobs:
+  checks:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.12"
+          enable-cache: true
+          cache-dependency-glob: "nisar-water/uv.lock"
+      - run: uv sync --frozen --extra test --python 3.13
+      - run: uv run --no-sync python scripts/check_repository.py
+      - run: uv run --no-sync python -m pytest -q --basetemp=.pytest-work
+      - run: uv run --no-sync python scripts/smoke_test.py --output outputs/ci-smoke

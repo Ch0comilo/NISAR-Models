@@ -55,6 +55,11 @@ def main():
                 raise ValueError("Credential-like content in " + relative.as_posix())
             if path.suffix == ".json":
                 json.loads(text, parse_constant=lambda value: (_ for _ in ()).throw(ValueError("Nonfinite JSON")))
+            if path.name == "NISAR_Water_Try_Your_Data.ipynb":
+                notebook = json.loads(text)
+                if any(c.get("outputs") or c.get("execution_count") is not None
+                       for c in notebook["cells"] if c["cell_type"] == "code"):
+                    raise ValueError("Clear the public notebook outputs/execution counts before publication")
     print(json.dumps({"state": "passed", "publication_files": len(paths),
                       "publication_bytes": sum(p.stat().st_size for p in paths),
                       "checkpoint_families": list(bundle["models"]),
