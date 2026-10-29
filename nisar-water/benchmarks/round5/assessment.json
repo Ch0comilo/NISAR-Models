@@ -1,0 +1,106 @@
+{
+  "created_at": "2026-10-29T05:17:40.376091Z",
+  "state": "not_ready_for_general_use",
+  "experiment_round": 5,
+  "selected_family": "radar",
+  "model_sha256": "954fffd6becc8b94d07b872c715e9589c461db6521986537c4ca575ceb7016f8",
+  "production_ready": false,
+  "models_changed_after_test": false,
+  "expert_reviews_completed": 0,
+  "new_test_images": 5,
+  "new_test_regions": 3,
+  "weak_reference_gate_passed": false,
+  "blocking_findings": [
+    {
+      "region": "yusufeli-shore",
+      "failed_checks": [
+        "full_reference_water_recovery",
+        "water_precision",
+        "low_historical_occurrence_water_recovery"
+      ]
+    },
+    {
+      "region": "nam-theun1-shore",
+      "failed_checks": [
+        "full_reference_water_recovery",
+        "low_historical_occurrence_water_recovery"
+      ]
+    },
+    {
+      "region": "alice-springs-airport",
+      "failed_checks": [
+        "land_false_positive_rate"
+      ]
+    }
+  ],
+  "selected_pooled_weak_metrics": {
+    "true_water_ha": 327.9999999999999,
+    "false_water_ha": 878.8399999999999,
+    "missed_water_ha": 114.39999999999998,
+    "true_nonwater_ha": 26830.92,
+    "precision": 0.2717841636008087,
+    "recall": 0.7414104882459313,
+    "specificity": 0.9682840991766078,
+    "false_positive_rate": 0.03171590082339219,
+    "f1": 0.3977589677669714,
+    "iou": 0.24825164239653655,
+    "reference_support_ha": 28152.159999999996,
+    "reference_water_ha": 442.3999999999999,
+    "reference_land_ha": 27709.76,
+    "classified_reference_ha": 28152.159999999996,
+    "withheld_reference_ha": 0.0,
+    "reference_coverage": 1.0
+  },
+  "historical_water_diagnostic": {
+    "low_historical_occurrence_water": {
+      "reference_water_ha": 350.0,
+      "classified_water_ha": 350.0,
+      "withheld_water_ha": 0.0,
+      "recovered_water_ha": 256.91999999999996,
+      "missed_water_ha": 93.07999999999998,
+      "reference_coverage": 1.0,
+      "recall_on_classified": 0.7340571428571427,
+      "recovered_fraction_of_full_reference": 0.7340571428571427
+    },
+    "historical_water": {
+      "reference_water_ha": 43.559999999999995,
+      "classified_water_ha": 43.559999999999995,
+      "withheld_water_ha": 0.0,
+      "recovered_water_ha": 35.919999999999995,
+      "missed_water_ha": 7.64,
+      "reference_coverage": 1.0,
+      "recall_on_classified": 0.8246097337006427,
+      "recovered_fraction_of_full_reference": 0.8246097337006427
+    },
+    "intermediate_occurrence_water": {
+      "reference_water_ha": 48.839999999999996,
+      "classified_water_ha": 48.839999999999996,
+      "withheld_water_ha": 0.0,
+      "recovered_water_ha": 35.16,
+      "missed_water_ha": 13.68,
+      "reference_coverage": 1.0,
+      "recall_on_classified": 0.7199017199017199,
+      "recovered_fraction_of_full_reference": 0.7199017199017199
+    },
+    "prior_unknown_water": {
+      "reference_water_ha": 0.0,
+      "classified_water_ha": 0.0,
+      "withheld_water_ha": 0.0,
+      "recovered_water_ha": 0.0,
+      "missed_water_ha": 0.0,
+      "reference_coverage": null,
+      "recall_on_classified": null,
+      "recovered_fraction_of_full_reference": null
+    }
+  },
+  "scope": "Current supported NISAR HH/HV L-GCOV 20m bounded UTM crops with genuine30m terrain and optional soft JRC2021 context",
+  "limitations": [
+    "Optical consensus is weak reference, not independent expert shoreline truth",
+    "Historical water and terrain can be stale where reservoirs or drainage have changed",
+    "A soft historical feature can still induce strong learned dependence; its emerging-water errors must be measured",
+    "Low historical occurrence alone does not establish a construction date or cause",
+    "No worldwide, narrow-river, flooded-vegetation or human-impact accuracy established"
+  ],
+  "human_review_materials": "review/earthengine/README.md; versioned import-review command",
+  "context_fallback": "Missing physical context is explicit254/unknown; precompute it or configure bounded context fetching for a new AOI"
+}

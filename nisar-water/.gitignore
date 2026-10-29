@@ -1,0 +1,47 @@
+# Local environments and generated Python artifacts
+.venv*/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.pytest-work/
+.cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+.coverage*
+htmlcov/
+.ipynb_checkpoints/
+
+# Research inputs, outputs and local runtime; portable checkpoints live separately
+/data/
+/outputs/
+/models/
+/evidence/
+/review/
+/vendor/
+/notebooks/*.ipynb
+/repository-ready.zip
+
+# Authentication and machine-local configuration
+.env
+.env.*
+!.env.example
+.secrets/
+**/.secrets/
+**/credentials
+**/credentials.json
+*.dpapi
+*.pem
+*.key
+.netrc
+_netrc
+earthdata-token*
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
+

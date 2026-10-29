@@ -1,0 +1,11 @@
+{
+  "type": "Feature",
+  "properties": {
+    "name": "Example reservoir AOI; replace with your study polygon",
+    "coordinate_reference_system": "WGS84 longitude, latitude"
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [[[-86.04, 36.23], [-85.99, 36.23], [-85.99, 36.28], [-86.04, 36.28], [-86.04, 36.23]]]
+  }
+}

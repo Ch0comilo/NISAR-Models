@@ -1,0 +1,22 @@
+* text=auto
+*.py text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.lock text eol=lf
+*.ps1 text eol=crlf
+*.joblib binary
+*.png binary
+*.tif binary
+*.zip binary
+# Frozen identities hash exact bytes, including original line endings.
+checkpoints/round5/** -text
+benchmarks/round5/assessment.json -text
+src/nisar_water/round5_evaluation.py -text
+src/nisar_water/context_model.py -text
+src/nisar_water/terrain_context.py -text
+src/nisar_water/model.py -text
+src/nisar_water/features.py -text
+src/nisar_water/inputs.py -text

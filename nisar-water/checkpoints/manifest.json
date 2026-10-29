@@ -1,0 +1,73 @@
+{
+  "schema_version": "nisar-water-checkpoint-bundle-1",
+  "scientific_status": "not_ready_for_general_use",
+  "source_freeze_sha256": "9875c407113043926cd1f965732003a93ee28adeb603a7c619c661c645e8d56b",
+  "source_manifest_sha256": "ce76043ecaada51a33ee77f705cc277bc0b962bc64b78bc802156e64be684c5a",
+  "assessment_path": "benchmarks/round5/assessment.json",
+  "assessment_sha256": "da177992bafc7f23b8cb0223711dfd131b313ab90ac834e7c575eb86870c6afd",
+  "implementation_hashes": {
+    "src/nisar_water/round5_evaluation.py": "1e769c679680447de8081b384df20742f1a7a04c297ab8c7e5f3bbdb952de661",
+    "src/nisar_water/context_model.py": "16474023532d88d6e26ee8925871cd1347eff7c52f2e738fce43a767bc3c2e18",
+    "src/nisar_water/terrain_context.py": "dab470d2d6048b5d0252e44533846968ce410fa6c32911928535932a281bd687",
+    "src/nisar_water/model.py": "05a2c708f51a5a4412e2cb4f3f6a37e82c496971a8c9a7013da78ee590681379",
+    "src/nisar_water/features.py": "c70d5c51d01414b0906cdfae84998dc757d2ee0d072c29d1664236125c30d1b4",
+    "src/nisar_water/inputs.py": "4a852ea583cc683169de794834b90fbedc2349a60710993e95588595720fccf7"
+  },
+  "models": {
+    "radar": {
+      "directory": "checkpoints/round5/radar",
+      "model_id": "nisar-water-radar-round5-v1-round5-validation-frozen",
+      "threshold": 0.2,
+      "feature_count": 41,
+      "assets": {
+        "model.json": {
+          "sha256": "954fffd6becc8b94d07b872c715e9589c461db6521986537c4ca575ceb7016f8",
+          "bytes": 3572
+        },
+        "estimator.joblib": {
+          "sha256": "c03dd1f17c55d2c804c3c6ed4a23b5025b821cc35071621ebcd11c2094b97d0f",
+          "bytes": 530647
+        }
+      },
+      "role": "validation_selected_diagnostic",
+      "production_ready": false
+    },
+    "terrain": {
+      "directory": "checkpoints/round5/terrain",
+      "model_id": "nisar-water-terrain-round5-v1-round5-validation-frozen",
+      "threshold": 0.1,
+      "feature_count": 46,
+      "assets": {
+        "model.json": {
+          "sha256": "0cb2308700c33c580d604873e66f046f827db2136a022801c457233a00e422c0",
+          "bytes": 3792
+        },
+        "estimator.joblib": {
+          "sha256": "9fb433e844806bd4dc70f173cb503f7edbdf46625624de7d091b5c6db242ea93",
+          "bytes": 522472
+        }
+      },
+      "role": "frozen_comparison_candidate",
+      "production_ready": false
+    },
+    "terrain_prior": {
+      "directory": "checkpoints/round5/terrain_prior",
+      "model_id": "nisar-water-terrain-prior-round5-v1-round5-validation-frozen",
+      "threshold": 0.1,
+      "feature_count": 49,
+      "assets": {
+        "model.json": {
+          "sha256": "e80ee5f302f41863e8d721cebb95278b6c4a5de9715088474289043d4154de34",
+          "bytes": 3985
+        },
+        "estimator.joblib": {
+          "sha256": "1117caf48b68fe3ac0845ef1433d625ddbadba1a5358776e81f71df5267c846f",
+          "bytes": 519443
+        }
+      },
+      "role": "frozen_comparison_candidate",
+      "production_ready": false
+    }
+  },
+  "selection_note": "No candidate passed all validation targets; comparisons were frozen before test use."
+}
