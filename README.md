@@ -12,6 +12,9 @@ Abre [el notebook](nisar-water/notebooks/NISAR_Water_Try_Your_Data.ipynb), ejecu
 las celdas en orden e introduce **tu propio token Bearer de NASA Earthdata**
 en el campo oculto. Puedes cambiar zona, fechas y perfil del modelo. El token
 no se incluye en archivos, salidas, URLs ni commits.
+La zona se dibuja con un rectángulo en el mapa y sus coordenadas se aplican a
+la búsqueda y el recorte. Cada fecha compara el radar sin clasificación con
+el resultado del modelo, uno al lado del otro.
 
 Para Jupyter local:
 

@@ -16,7 +16,7 @@ jobs:
         with:
           version: "0.11.12"
           enable-cache: true
-      - run: uv sync --frozen --extra test --python 3.13
+      - run: uv sync --frozen --extra test --extra notebook --python 3.13
       - run: uv run --no-sync python scripts/check_repository.py
       - run: uv run --no-sync python -m pytest -q --basetemp=.pytest-work
       - run: uv run --no-sync python scripts/smoke_test.py --output outputs/ci-smoke

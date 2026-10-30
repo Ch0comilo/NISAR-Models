@@ -17,6 +17,9 @@ or open [the public notebook](notebooks/NISAR_Water_Try_Your_Data.ipynb) locally
 It accepts your own Bearer token through a hidden prompt, acquires bounded real
 NISAR crops without sibling projects, displays water/borders and temporal
 support, and checks the saved-result HTTP API. It does not save credentials.
+Draw a rectangle on the interactive map to set the actual acquisition AOI.
+Each date compares the unclassified HH radar image and the model overlay side
+by side, with identical display bounds and gray scale.
 See [the Spanish notebook guide](docs/notebook-earthdata.md).
 
 ```sh

@@ -4,6 +4,7 @@
 .cache
 .pytest_cache
 .pytest-work
+anaconda_projects
 **/__pycache__
 data
 outputs

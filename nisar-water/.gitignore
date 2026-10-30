@@ -44,6 +44,7 @@ earthdata-token*
 # Editor and operating-system files
 .vscode/
 .idea/
+anaconda_projects/
 .DS_Store
 Thumbs.db
 Desktop.ini

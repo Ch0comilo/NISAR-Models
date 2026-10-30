@@ -18,10 +18,39 @@ Usa Python 3.12 o 3.13. En Colab, la primera celda clona el repositorio cuando
 hace falta y prepara un intérprete de inferencia aislado para evitar conflictos
 con NumPy u otras librerías del kernel. No exige reiniciar el kernel. La
 preparación inicial necesita conexión y puede tardar varios minutos.
+El entorno aislado se prepara con `uv` y el lockfile; no requiere privilegios
+de administrador. El mapa usa `ipyleaflet` e `ipywidgets` en el kernel del
+notebook, con el gestor de widgets de Colab habilitado cuando corresponde.
+
+## Seleccionar la zona con el mapa
+
+Ejecuta la celda **2.1**. El rectángulo del ejemplo aparece sobre un mapa base.
+Mueve/acerca el mapa y pulsa **□** para dibujar tu zona. Al terminar, el campo
+`[oeste, sur, este, norte]` se actualiza con el GeoJSON que devuelve el mapa.
+Para cambiar la zona, dibuja otro rectángulo: reemplaza al anterior. El botón
+**Borrar selección** elimina la zona inmediatamente y bloquea la inferencia.
+También puedes escribir un BBOX y pulsar **Aplicar coordenadas**.
+
+La celda de inferencia lee la selección actual al comenzar, incluso si cambió
+después de introducir el token. El archivo AOI, la búsqueda y el recorte usan
+esas mismas coordenadas, sin invertir latitud/longitud ni ajustar a una grilla.
+Mover o acercar el mapa por sí solo no cambia la zona seleccionada. Una zona
+inválida, borrada o unas coordenadas escritas sin aplicar bloquean la ejecución;
+los límites exactos de área/píxeles/contexto se verifican antes de adquirir datos.
+
+El mapa de OpenStreetMap y la capa satelital opcional solo sirven de referencia;
+no son la imagen NISAR ni entran al modelo. El mapa requiere conexión para los
+tiles y una sesión activa del kernel. La vista estática de GitHub no permite
+dibujar: abre el notebook en Colab o Jupyter.
+
+Cada fecha muestra **radar HH sin clasificación a la izquierda** y **el modelo
+con agua/borde a la derecha**. Ambos paneles usan el mismo recorte y escala
+−30 a +3 dB; se conserva debajo la máscara de incertidumbre.
 
 ## Qué se configura
 
-- `BBOX`: oeste, sur, este, norte, en longitud/latitud WGS84.
+- `INITIAL_BBOX`: solo sitúa el ejemplo inicial. El BBOX real viene del
+  rectángulo actual del mapa, en longitud/latitud WGS84.
 - `START_DATE`, `END_DATE`: intervalo de fechas UTC de hasta 366 días.
 - `MODEL_PROFILE`: `radar`, `terrain` o `terrain_prior`. El último es el perfil
   conservador de comparación; ninguno está aceptado para uso general.
@@ -105,3 +134,10 @@ conserva identidades, soporte y comprobaciones. La ejecución real se hizo en
 Jupyter/Python 3.13; la interfaz alojada de Colab no se probó manualmente. El
 notebook publicado se mantiene limpio para que cada usuario lo ejecute con
 su propia cuenta y configuración.
+
+La versión con mapa se verificó después con ocho celdas, dos recortes reales y
+una selección distinta del ejemplo, conservando exactamente sus coordenadas
+hasta la petición y los resultados. Se comprobaron los dos paneles por fecha,
+la API y la selección/borrado en un navegador Jupyter local. El
+[recibo del mapa](../benchmarks/notebook-map-demo.json) registra estas pruebas.
+La interfaz alojada de Colab no se probó manualmente.

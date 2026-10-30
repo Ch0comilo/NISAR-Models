@@ -31,6 +31,7 @@ catálogos ni salidas. No pegues el token en una celda de código."""),
         code('''from pathlib import Path
 import importlib.util
 import os
+import shutil
 import subprocess
 import sys
 
@@ -52,17 +53,28 @@ if PROJECT_ROOT is None:
         raise RuntimeError("No se encontró nisar-water/checkpoints en el repositorio clonado.")
 
 python_name = "Scripts/python.exe" if os.name == "nt" else "bin/python"
+def ensure_uv():
+    executable = shutil.which("uv")
+    if executable:
+        return [executable]
+    if importlib.util.find_spec("uv") is None:
+        subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", "uv==0.11.12"], check=True)
+    return [sys.executable, "-m", "uv"]
+
 WORKER_PYTHON = PROJECT_ROOT / ".venv" / python_name
 if not WORKER_PYTHON.is_file():
     isolated = PROJECT_ROOT / ".venv-notebook"
     WORKER_PYTHON = isolated / python_name
     if not WORKER_PYTHON.is_file():
-        subprocess.run([sys.executable, "-m", "venv", str(isolated)], check=True)
+        subprocess.run(ensure_uv() + ["venv", "--python", sys.executable, str(isolated)], check=True)
     installed = subprocess.run([str(WORKER_PYTHON), "-c", "import nisar_water, h5py, sklearn"],
                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     if installed.returncode:
-        print("Instalando el entorno aislado de inferencia; el kernel conserva sus librerías.")
-        subprocess.run([str(WORKER_PYTHON), "-m", "pip", "install", "--quiet", "-e", str(PROJECT_ROOT)], check=True)
+        print("Preparando el entorno aislado de inferencia con las versiones del lockfile.")
+        worker_environment = os.environ.copy()
+        worker_environment["UV_PROJECT_ENVIRONMENT"] = str(isolated)
+        subprocess.run(ensure_uv() + ["sync", "--frozen", "--project", str(PROJECT_ROOT),
+                       "--python", sys.executable], env=worker_environment, check=True)
 
 os.chdir(PROJECT_ROOT)
 subprocess.run([str(WORKER_PYTHON), "-c", "from nisar_water.registry import load_model; load_model('checkpoints/round5/terrain_prior')"],
@@ -72,7 +84,9 @@ print("Proyecto e intérprete listos; checkpoint conservador verificado.")'''),
 
 El ejemplo usa Nam Theun 1, Laos, con dos observaciones compatibles de octubre
 de 2026. Es una demostración conocida; sus resultados no constituyen una prueba
-independiente. Sustituye `BBOX` y las fechas para probar tu zona.
+independiente. Cambia las fechas/perfil aquí y **dibuja tu zona en el mapa** de
+la celda siguiente. `INITIAL_BBOX` solo coloca el ejemplo inicial; el rectángulo
+actual del mapa es la fuente de las coordenadas de búsqueda y recorte.
 
 Solo se admite **NISAR L-GCOV, frecuencia A, HH/HV, potencia gamma0 lineal**.
 La ventana debe ser pequeña: como máximo 0,2° por lado con contexto y cuatro
@@ -86,8 +100,8 @@ no se inventan resultados. Diferentes órbitas/geometrías forman series separad
 import uuid
 from datetime import datetime, timezone
 
-# Coordenadas WGS84: [oeste, sur, este, norte].
-BBOX = [104.18, 18.34, 104.26, 18.42]
+# Rectángulo inicial WGS84: [oeste, sur, este, norte]. Cámbialo desde el mapa.
+INITIAL_BBOX = [104.18, 18.34, 104.26, 18.42]
 START_DATE = "2026-10-06"
 END_DATE = "2026-10-27"
 MODEL_PROFILE = "terrain_prior"  # radar | terrain | terrain_prior
@@ -96,19 +110,49 @@ TRANSFER_CAP_MIB = 256          # radar; hasta 128 MiB por adquisición
 
 if MODEL_PROFILE not in {"radar", "terrain", "terrain_prior"}:
     raise ValueError("Selecciona un perfil incluido en el repositorio.")
-west, south, east, north = BBOX
-AOI = {"type": "Polygon", "coordinates": [[[west, south], [east, south],
-        [east, north], [west, north], [west, south]]]}
-run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:6]
-OUTPUT = PROJECT_ROOT / "outputs" / ("earthdata-demo-" + run_id)
-INPUT_CONFIG = PROJECT_ROOT / ".cache/notebook-inputs" / (run_id + ".geojson")
-INPUT_CONFIG.parent.mkdir(parents=True, exist_ok=True)
-INPUT_CONFIG.write_text(json.dumps(AOI, indent=2), encoding="utf-8")
 MODEL = PROJECT_ROOT / "checkpoints/round5" / MODEL_PROFILE
 CONTEXT_CACHE = PROJECT_ROOT / ".cache/terrain-context"
-print("Zona:", BBOX, "| Fechas:", START_DATE, "a", END_DATE)
+print("Fechas:", START_DATE, "a", END_DATE)
 print("Perfil:", MODEL_PROFILE, "| Máximo:", MAX_OBSERVATIONS, "| Radar MiB:", TRANSFER_CAP_MIB)
 print("La potencia científica se recorta; no se descargan gránulos completos.")'''),
+        md("""### 2.1. Seleccionar el rectángulo en el mapa
+
+Mueve/acerca el mapa y pulsa el botón de rectángulo (□) para dibujar tu zona.
+Para cambiarla, dibuja otro rectángulo; **Borrar selección** la elimina de
+inmediato. Se conserva **un solo rectángulo**, el último dibujado, y sus
+coordenadas se actualizan automáticamente.
+El ejemplo inicial ya está seleccionado para poder ejecutar todo sin dibujar.
+
+Puedes alternar mapa/satélite de referencia o usar el campo de coordenadas y
+**Aplicar coordenadas**. El mapa base no es la imagen NISAR del modelo. Un
+rectángulo inválido, eliminado o unas coordenadas sin aplicar bloquean la
+inferencia; nunca se reutiliza silenciosamente una zona anterior. Los límites
+exactos de contexto/píxeles se comprueban antes de adquirir datos."""),
+        code('''# Los widgets viven en el kernel; el modelo conserva su intérprete aislado.
+from importlib.metadata import version, PackageNotFoundError
+try:
+    ui_ready = version("ipyleaflet") == "0.20.0" and int(version("ipywidgets").split(".")[0]) == 8
+except PackageNotFoundError:
+    ui_ready = False
+if not ui_ready:
+    requirements = ["ipyleaflet==0.20.0", "ipywidgets>=8.1,<9"]
+    if importlib.util.find_spec("pip") is not None:
+        installer = [sys.executable, "-m", "pip", "install", "--quiet"]
+    else:
+        installer = ensure_uv() + ["pip", "install", "--python", sys.executable]
+    subprocess.run(installer + requirements, check=True)
+
+if "google.colab" in sys.modules:
+    from google.colab import output as colab_output
+    colab_output.enable_custom_widget_manager()
+
+if str(PROJECT_ROOT / "src") not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT / "src"))
+from nisar_water.notebook_map import RectanglePicker
+from IPython.display import display
+
+roi_picker = RectanglePicker(INITIAL_BBOX)
+display(roi_picker.widget)'''),
         md("""## 3. Introducir tu token Bearer
 
 Obtén o genera tu token en tu propia cuenta de Earthdata Login y acepta los
@@ -120,6 +164,8 @@ lo retira del entorno del kernel al leerlo. Nunca añadas el valor al notebook,
 al repositorio ni a los parámetros del comando."""),
         code('''from getpass import getpass
 
+# No se pide credencial si el mapa no tiene una selección válida.
+roi_picker.selection()
 _bearer = os.environ.pop("EARTHDATA_TOKEN", None) or getpass("Token Bearer Earthdata (oculto): ")
 _bearer = _bearer.strip()
 if _bearer.lower().startswith("bearer "):
@@ -139,14 +185,7 @@ Los perfiles físicos pueden obtener DEM/HAND/JRC públicos en una caché local
 entrada aprendida, no una máscara obligatoria de agua. Contexto físico requerido
 ausente produce **desconocido**, no terreno seco. El token se elimina de las
 variables de este notebook al finalizar el comando, incluso si falla."""),
-        code('''command = [str(WORKER_PYTHON), "-m", "nisar_water.cli", "aoi", str(INPUT_CONFIG),
-           "--start", START_DATE, "--end", END_DATE, "--model", str(MODEL),
-           "--output", str(OUTPUT), "--limit", str(MAX_OBSERVATIONS),
-           "--transfer-cap-mib", str(TRANSFER_CAP_MIB)]
-if MODEL_PROFILE != "radar":
-    command += ["--context-cache", str(CONTEXT_CACHE)]
-
-def run_authenticated(command, credential):
+        code('''def run_authenticated(command, credential):
     child_environment = os.environ.copy()
     child_environment["EARTHDATA_TOKEN"] = credential
     try:
@@ -164,6 +203,28 @@ def run_authenticated(command, credential):
 try:
     if not _bearer:
         raise ValueError("Ejecuta primero la celda del token.")
+    # Leer el estado ACTUAL, incluso si cambiaste el mapa después de introducir el token.
+    selected = roi_picker.selection()
+    BBOX, AOI = selected["bbox"], selected["aoi"]
+    preflight = subprocess.run([str(WORKER_PYTHON), "-c",
+        "import json,sys; from nisar_water.live_acquisition import validate_aoi; validate_aoi(json.load(sys.stdin))"],
+        input=json.dumps(AOI, allow_nan=False), cwd=PROJECT_ROOT,
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    if preflight.returncode:
+        print(preflight.stdout.replace(str(PROJECT_ROOT), "."))
+        raise ValueError("Reduce o corrige el rectángulo del mapa; no se descargaron datos.")
+    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:6]
+    OUTPUT = PROJECT_ROOT / "outputs" / ("earthdata-demo-" + run_id)
+    INPUT_CONFIG = PROJECT_ROOT / ".cache/notebook-inputs" / (run_id + ".geojson")
+    INPUT_CONFIG.parent.mkdir(parents=True, exist_ok=True)
+    INPUT_CONFIG.write_text(json.dumps(AOI, indent=2, allow_nan=False), encoding="utf-8")
+    print("Rectángulo usado [O, S, E, N]:", BBOX)
+    command = [str(WORKER_PYTHON), "-m", "nisar_water.cli", "aoi", str(INPUT_CONFIG),
+               "--start", START_DATE, "--end", END_DATE, "--model", str(MODEL),
+               "--output", str(OUTPUT), "--limit", str(MAX_OBSERVATIONS),
+               "--transfer-cap-mib", str(TRANSFER_CAP_MIB)]
+    if MODEL_PROFILE != "radar":
+        command += ["--context-cache", str(CONTEXT_CACHE)]
     run_authenticated(command, _bearer)
 finally:
     _bearer = None
@@ -175,13 +236,17 @@ print("Consulta completa:", BATCH["complete_for_compatible_query"],
       "| Radar transferido MiB:", round(BATCH["radar_body_bytes"] / 1024**2, 2))
 if not BATCH["acquired_observations"]:
     print("No hay imágenes para mostrar. Cambia zona/fechas o revisa los recibos de adquisición.")'''),
-        md("""## 5. Ver agua y borde en cada observación
+        md("""## 5. Comparar radar sin clasificar y resultado del modelo
 
 Azul = agua clasificada; cian = su borde; las zonas sin soporte no son agua ni
-terreno seco. La primera imagen muestra el radar con la predicción y la segunda
-la máscara de incertidumbre. Estos mapas son estimaciones experimentales."""),
+terreno seco. Cada fecha muestra **radar HH sin superposición a la izquierda**
+y **el resultado del modelo a la derecha**, con el mismo recorte, escala de
+grises (−30 a +3 dB) y orientación. Abajo se conserva la máscara de incertidumbre.
+La imagen gris es una visualización del radar de entrada, no una imagen óptica.
+Estos mapas son estimaciones experimentales."""),
         code('''from IPython.display import display, Image, HTML
 from html import escape
+import base64
 
 SERIES = []
 for manifest_path in sorted(OUTPUT.rglob("series.json")):
@@ -194,11 +259,22 @@ for manifest_path in sorted(OUTPUT.rglob("series.json")):
         print(observation["datetime"], "| Agua ha:", round(stats["waterHa"], 2),
               "| Desconocido ha:", round(stats["uncertainHa"], 2),
               "| No observado ha:", round(stats["unobservedHa"], 2))
-        for asset_name in ("composite", "uncertain"):
-            asset = observation["assets"].get(asset_name)
-            if asset:
-                path = manifest_path.parent / asset["url"].removeprefix("/assets/")
-                display(Image(filename=str(path), width=700))'''),
+        panels = []
+        for title, asset_name in (("Radar HH sin clasificación", "sar"),
+                                  ("Modelo: agua azul y borde cian", "composite")):
+            asset = observation["assets"][asset_name]
+            path = manifest_path.parent / asset["url"].removeprefix("/assets/")
+            encoded = base64.b64encode(path.read_bytes()).decode("ascii")
+            panels.append("<figure style='margin:0'><figcaption><b>" + escape(title) +
+                          "</b></figcaption><img style='width:100%;height:auto' alt='" +
+                          escape(title) + "' src='data:image/png;base64," + encoded + "'></figure>")
+        display(HTML("<div style='display:grid;grid-template-columns:repeat(2,minmax(0,1fr));"
+                     "gap:14px;max-width:1500px'>" + "".join(panels) + "</div>"))
+        asset = observation["assets"].get("uncertain")
+        if asset:
+            print("Máscara de incertidumbre (ámbar):")
+            path = manifest_path.parent / asset["url"].removeprefix("/assets/")
+            display(Image(filename=str(path), width=700))'''),
         md("""## 6. Evolución en soporte comparable
 
 El área total puede cambiar porque cambia la cobertura. La tabla usa la
@@ -281,8 +357,10 @@ GeoJSON de agua y procedencia de contexto. Códigos: **0** no agua, **1** agua,
 **254** observado pero desconocido/excluido, **255** no observado/fuera del AOI.
 El puntaje es no calibrado; no lo muestres como una certeza verificada.
 
-Para otra prueba: cambia zona/fechas/perfil, ejecuta desde la configuración e
-introduce otra vez tu token. Cada ejecución crea un directorio nuevo. No
+Para otra prueba: cambia el rectángulo del mapa (sin volver a ejecutar su celda),
+ajusta fechas/perfil si hace falta e introduce otra vez tu token. Si ejecutas de
+nuevo la celda del mapa, se restaura el ejemplo inicial. La celda de inferencia
+siempre toma la selección actual y crea un directorio nuevo. No
 subas cachés, credenciales ni datos científicos al repositorio.
 
 **Si falla:** `AUTHENTICATION_FAILED` pide revisar/renovar el token;

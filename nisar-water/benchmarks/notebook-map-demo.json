@@ -1,0 +1,45 @@
+{
+  "state": "passed",
+  "scope": "Notebook interaction and actual-data inference, no accuracy claim",
+  "execution": {
+    "state": "passed",
+    "code_cells": 8,
+    "outputs": 20,
+    "errors": 0,
+    "actual_nisar_observations": 2,
+    "bbox_exactly_matches_edited_map": true,
+    "paired_original_model_images": 2
+  },
+  "requested_bbox": [
+    104.185123456789,
+    18.345123456789,
+    104.255123456789,
+    18.415123456789
+  ],
+  "aoi_matches_map_snapshot": true,
+  "query_complete": true,
+  "radar_body_bytes": 32505872,
+  "paired_sar_and_model_panels": 2,
+  "browser_draw_reached_kernel": true,
+  "browser_bbox": [
+    104.186858,
+    18.346183,
+    104.25139,
+    18.411997
+  ],
+  "browser_clear_blocked_selection": true,
+  "browser_apply_restored_selection": true,
+  "fresh_worker_bootstrap": {
+    "state": "passed",
+    "worker_has_no_pip": true,
+    "fresh_isolated_environment": true
+  },
+  "software_tests": {
+    "passed": 171,
+    "skipped": 3
+  },
+  "credentials_published": false,
+  "checkpoints_changed": false,
+  "model_readiness": "not_ready_for_general_use",
+  "hosted_colab_ui_manually_tested": false
+}
