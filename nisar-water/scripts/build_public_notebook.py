@@ -131,7 +131,9 @@ Puedes cambiar el mapa base o usar el campo de coordenadas y
 rectángulo inválido, eliminado o unas coordenadas sin aplicar bloquean la
 inferencia; nunca se reutiliza silenciosamente una zona anterior. Los límites
 exactos de contexto/píxeles se comprueban antes de adquirir datos."""),
-        code('''# Los widgets viven en el kernel; el modelo conserva su intérprete aislado.
+        code((ROOT / "scripts/notebook_map_bootstrap.py").read_text(encoding="utf-8") + '''
+
+# Los widgets viven en el kernel; el modelo conserva su intérprete aislado.
 from importlib.metadata import version, PackageNotFoundError
 try:
     ui_ready = version("ipyleaflet") == "0.20.0" and int(version("ipywidgets").split(".")[0]) == 8
@@ -149,26 +151,9 @@ if "google.colab" in sys.modules:
     from google.colab import output as colab_output
     colab_output.enable_custom_widget_manager()
 
-if str(PROJECT_ROOT / "src") not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT / "src"))
-from nisar_water import notebook_map
-import importlib
-notebook_map = importlib.reload(notebook_map)
-# Una sesión de Colab puede conservar un clon anterior aunque abras el notebook nuevo.
-if getattr(notebook_map.RectanglePicker, "basemap_version", None) != "esri-gibs-v1":
-    if "google.colab" in sys.modules:
-        repo_root = PROJECT_ROOT.parent
-        remote = subprocess.run(["git", "-C", str(repo_root), "remote", "get-url", "origin"],
-                                capture_output=True, text=True, check=True).stdout.strip()
-        dirty = subprocess.run(["git", "-C", str(repo_root), "status", "--porcelain", "--untracked-files=no"],
-                               capture_output=True, text=True, check=True).stdout.strip()
-        if remote != REPOSITORY or dirty:
-            raise RuntimeError("La copia es antigua y contiene cambios locales o usa otro repositorio. Actualízala manualmente o abre una sesión nueva de Colab.")
-        subprocess.run(["git", "-C", str(repo_root), "pull", "--ff-only", "origin", "main"], check=True)
-        importlib.invalidate_caches()
-        notebook_map = importlib.reload(notebook_map)
-    if getattr(notebook_map.RectanglePicker, "basemap_version", None) != "esri-gibs-v1":
-        raise RuntimeError("Actualiza el repositorio antes de abrir el mapa o usa una sesión nueva de Colab.")
+# La comprobación y actualización ocurren ANTES de importar el paquete.
+notebook_map = load_notebook_map(PROJECT_ROOT, REPOSITORY,
+                               allow_update="google.colab" in sys.modules)
 RectanglePicker = notebook_map.RectanglePicker
 from IPython.display import display
 

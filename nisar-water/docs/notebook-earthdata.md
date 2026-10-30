@@ -50,10 +50,13 @@ modelo. No reciben el token Earthdata. El mapa requiere conexión para los
 tiles y una sesión activa del kernel. La vista estática de GitHub no permite
 dibujar: abre el notebook en Colab o Jupyter.
 
-La celda del mapa recarga el módulo para evitar una clase antigua en memoria.
-Si Colab conserva una copia oficial antigua y sin cambios locales, la actualiza
-por avance directo; si hay cambios locales, pide actualizarla manualmente o
-usar una sesión nueva. No sobrescribe cambios ni reescribe historial.
+La celda del mapa comprueba los archivos antes de importar el paquete, incluso
+si el clon es tan antiguo que todavía no contiene `notebook_map.py`. Si Colab
+conserva una copia oficial antigua y sin cambios locales, la actualiza por
+avance directo. También descarta los módulos del mapa cargados anteriormente
+y corrige un paquete en memoria que provenga de otro clon. Si hay cambios
+locales, pide actualizar la copia manualmente o usar una sesión nueva.
+No sobrescribe cambios ni reescribe historial.
 
 Cada fecha muestra **radar HH sin clasificación a la izquierda** y **el modelo
 con agua/borde a la derecha**. Ambos paneles usan el mismo recorte y escala
@@ -118,6 +121,7 @@ atribuyas actividad humana a partir de esta clasificación.
 
 | Categoría | Acción |
 |---|---|
+| `cannot import name 'notebook_map'` | Reabrir la versión actual desde el enlace de Colab y ejecutar las celdas 1, 2 y 2.1; el bootstrap actualizado repara un clon oficial limpio antes del import |
 | `AUTHENTICATION_FAILED` | Revisar o renovar el token propio |
 | `AUTHORIZATION_OR_AGREEMENT_REQUIRED` | Revisar permisos/acuerdos Earthdata/ASF |
 | `TRANSFER_LIMIT` | Reducir la zona/fechas o ampliar explícitamente el presupuesto |
