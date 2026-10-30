@@ -38,10 +38,22 @@ Mover o acercar el mapa por sí solo no cambia la zona seleccionada. Una zona
 inválida, borrada o unas coordenadas escritas sin aplicar bloquean la ejecución;
 los límites exactos de área/píxeles/contexto se verifican antes de adquirir datos.
 
-El mapa de OpenStreetMap y la capa satelital opcional solo sirven de referencia;
-no son la imagen NISAR ni entran al modelo. El mapa requiere conexión para los
+El fondo inicial es **Satélite (Esri)**. **Mapa base** permite cambiar a un mapa
+topográfico de Esri o a **NASA Blue Marble**, un respaldo global de menor
+detalle que conserva el zoom y la zona seleccionada. No se utiliza
+`tile.openstreetmap.org`, que puede bloquear las peticiones del entorno Colab
+con un 403 según su [política de mosaicos](https://operations.osmfoundation.org/policies/tiles/).
+No se modifica la identificación de las peticiones para eludir ese bloqueo.
+
+Estos fondos solo sirven de referencia; no son la imagen NISAR ni entran al
+modelo. No reciben el token Earthdata. El mapa requiere conexión para los
 tiles y una sesión activa del kernel. La vista estática de GitHub no permite
 dibujar: abre el notebook en Colab o Jupyter.
+
+La celda del mapa recarga el módulo para evitar una clase antigua en memoria.
+Si Colab conserva una copia oficial antigua y sin cambios locales, la actualiza
+por avance directo; si hay cambios locales, pide actualizarla manualmente o
+usar una sesión nueva. No sobrescribe cambios ni reescribe historial.
 
 Cada fecha muestra **radar HH sin clasificación a la izquierda** y **el modelo
 con agua/borde a la derecha**. Ambos paneles usan el mismo recorte y escala

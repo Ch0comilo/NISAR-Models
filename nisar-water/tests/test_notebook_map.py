@@ -1,5 +1,6 @@
 """The widget's synchronized drawing state is the single source of the AOI."""
 import json
+from urllib.parse import urlsplit
 
 import pytest
 
@@ -87,3 +88,41 @@ def test_selection_snapshot_does_not_mutate_after_later_edit(picker):
     picker.clear.click()
     with pytest.raises(ValueError):
         picker.selection()
+
+
+def test_default_basemap_does_not_depend_on_the_blocked_osm_tile_service(picker):
+    assert picker.basemap_choice.value == "satellite"
+    assert urlsplit(picker.map.layers[0].url).hostname == "server.arcgisonline.com"
+    assert "World_Imagery" in picker.map.layers[0].url
+    assert picker.map.layers[0].attribution
+
+
+@pytest.mark.parametrize("kind", ["topographic", "nasa", "satellite"])
+def test_switching_background_keeps_the_drawn_aoi_center_zoom_and_controls(picker, kind):
+    selected = [-75.123456789, -6.987654321, -75.05, -6.91]
+    picker.set_bbox(selected)
+    expected = picker.selection()
+    center, zoom = tuple(picker.map.center), picker.map.zoom
+    controls = picker.map.controls
+    picker.basemap_choice.value = kind
+    assert picker.selection() == expected
+    assert tuple(picker.map.center) == center and picker.map.zoom == zoom
+    assert picker.map.controls == controls and len(picker.map.layers) == 1
+    layer = picker.map.layers[0]
+    assert layer.base and layer.attribution
+    assert "tile.openstreetmap.org" not in layer.url and "apikey" not in layer.url
+
+
+def test_nasa_backup_overzooms_native_tiles_instead_of_requesting_missing_zoom_levels(picker):
+    picker.basemap_choice.value = "nasa"
+    layer = picker.map.layers[0]
+    assert urlsplit(layer.url).hostname == "gibs.earthdata.nasa.gov"
+    assert layer.max_native_zoom == 8 and layer.max_zoom >= picker.map.zoom
+
+
+def test_switching_basemap_cannot_restore_a_deleted_rectangle(picker):
+    picker.clear.click()
+    picker.basemap_choice.value = "nasa"
+    with pytest.raises(ValueError):
+        picker.selection()
+    assert not picker.draw.data and picker.coordinates.value == ""

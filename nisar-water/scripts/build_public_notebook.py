@@ -123,7 +123,10 @@ inmediato. Se conserva **un solo rectángulo**, el último dibujado, y sus
 coordenadas se actualizan automáticamente.
 El ejemplo inicial ya está seleccionado para poder ejecutar todo sin dibujar.
 
-Puedes alternar mapa/satélite de referencia o usar el campo de coordenadas y
+El fondo inicial es **Satélite (Esri)**. Si no carga, cambia **Mapa base** a
+Topográfico (Esri) o NASA Blue Marble, un respaldo global de menor detalle.
+No se usa el servidor de mosaicos comunitario de OpenStreetMap.
+Puedes cambiar el mapa base o usar el campo de coordenadas y
 **Aplicar coordenadas**. El mapa base no es la imagen NISAR del modelo. Un
 rectángulo inválido, eliminado o unas coordenadas sin aplicar bloquean la
 inferencia; nunca se reutiliza silenciosamente una zona anterior. Los límites
@@ -148,7 +151,25 @@ if "google.colab" in sys.modules:
 
 if str(PROJECT_ROOT / "src") not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT / "src"))
-from nisar_water.notebook_map import RectanglePicker
+from nisar_water import notebook_map
+import importlib
+notebook_map = importlib.reload(notebook_map)
+# Una sesión de Colab puede conservar un clon anterior aunque abras el notebook nuevo.
+if getattr(notebook_map.RectanglePicker, "basemap_version", None) != "esri-gibs-v1":
+    if "google.colab" in sys.modules:
+        repo_root = PROJECT_ROOT.parent
+        remote = subprocess.run(["git", "-C", str(repo_root), "remote", "get-url", "origin"],
+                                capture_output=True, text=True, check=True).stdout.strip()
+        dirty = subprocess.run(["git", "-C", str(repo_root), "status", "--porcelain", "--untracked-files=no"],
+                               capture_output=True, text=True, check=True).stdout.strip()
+        if remote != REPOSITORY or dirty:
+            raise RuntimeError("La copia es antigua y contiene cambios locales o usa otro repositorio. Actualízala manualmente o abre una sesión nueva de Colab.")
+        subprocess.run(["git", "-C", str(repo_root), "pull", "--ff-only", "origin", "main"], check=True)
+        importlib.invalidate_caches()
+        notebook_map = importlib.reload(notebook_map)
+    if getattr(notebook_map.RectanglePicker, "basemap_version", None) != "esri-gibs-v1":
+        raise RuntimeError("Actualiza el repositorio antes de abrir el mapa o usa una sesión nueva de Colab.")
+RectanglePicker = notebook_map.RectanglePicker
 from IPython.display import display
 
 roi_picker = RectanglePicker(INITIAL_BBOX)

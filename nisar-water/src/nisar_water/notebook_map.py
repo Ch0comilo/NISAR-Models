@@ -4,7 +4,7 @@ from html import escape
 import json
 
 import ipywidgets as widgets
-from ipyleaflet import DrawControl, LayersControl, Map, ScaleControl, basemaps, basemap_to_tiles
+from ipyleaflet import DrawControl, Map, ScaleControl, TileLayer, basemaps, basemap_to_tiles
 
 from .notebook_aoi import bbox_selection, rectangle_selection
 
@@ -16,6 +16,8 @@ class RectanglePicker:
     Invalid/deleted or unapplied manual input blocks selection(), preventing a
     previous/default rectangle from being used silently for a new request.
     """
+    basemap_version = "esri-gibs-v1"
+
     def __init__(self, initial_bbox):
         initial = bbox_selection(initial_bbox)
         self.initial_bbox = initial["bbox"]
@@ -23,14 +25,15 @@ class RectanglePicker:
         self._updating = False
         self._manual_dirty = False
         west, south, east, north = self.initial_bbox
+        self._basemap_layer = self._make_basemap("satellite")
         self.map = Map(center=((south + north) / 2, (west + east) / 2), zoom=11,
-                       scroll_wheel_zoom=True, basemap=basemaps.OpenStreetMap.Mapnik,
+                       scroll_wheel_zoom=True, basemap=self._basemap_layer,
                        layout=widgets.Layout(height="500px", width="100%"))
-        satellite = basemap_to_tiles(basemaps.Esri.WorldImagery)
-        satellite.name = "Satélite de referencia (no es NISAR)"
-        satellite.visible = False
-        self.map.add(satellite)
-        self.map.add(LayersControl(position="topright"))
+        self.basemap_choice = widgets.Dropdown(description="Mapa base:", value="satellite",
+            options=[("Satélite (Esri)", "satellite"), ("Topográfico (Esri)", "topographic"),
+                     ("NASA Blue Marble — respaldo global", "nasa")],
+            style={"description_width": "initial"}, layout=widgets.Layout(width="450px"))
+        self.basemap_choice.observe(self._on_basemap, names="value")
         self.map.add(ScaleControl(position="bottomleft"))
         self.draw = DrawControl(polyline={}, polygon={}, circle={}, circlemarker={}, marker={},
                                 rectangle={"shapeOptions": {"color": "#087f8c", "weight": 2,
@@ -46,8 +49,9 @@ class RectanglePicker:
             "<b>Dibuja tu rectángulo con el botón □ del mapa.</b> Puedes mover el mapa, "
             "acercar y dibujar otro para cambiar la zona. Solo se utiliza el último. "
             "Borrar selección elimina la zona inmediatamente. "
-            "El mapa base sirve de orientación; las imágenes NISAR aparecen más abajo.")
-        self.widget = widgets.VBox([instructions, self.map,
+            "El mapa base sirve de orientación; las imágenes NISAR aparecen más abajo. "
+            "Si el fondo no carga, cambia Mapa base. NASA es una vista global de menor detalle.")
+        self.widget = widgets.VBox([instructions, self.basemap_choice, self.map,
             widgets.HBox([self.coordinates, self.apply]), widgets.HBox([self.reset, self.clear]), self.status])
         self.draw.observe(self._on_data, names="data")
         # Leaflet's edit/delete tools retain unapplied state until Save and
@@ -58,6 +62,31 @@ class RectanglePicker:
         self.reset.on_click(lambda _: self.set_bbox(self.initial_bbox, recenter=True))
         self.clear.on_click(lambda _: self.clear_selection())
         self.set_bbox(self.initial_bbox)
+
+    @staticmethod
+    def _make_basemap(kind):
+        # No requests to the community tile.openstreetmap.org service. Each
+        # background uses public imagery without Earthdata credentials/keys.
+        if kind == "satellite":
+            layer = basemap_to_tiles(basemaps.Esri.WorldImagery, base=True)
+            layer.name = "Satélite de referencia (Esri; no es NISAR)"
+            return layer
+        if kind == "topographic":
+            layer = basemap_to_tiles(basemaps.Esri.WorldTopoMap, base=True)
+            layer.name = "Topográfico (Esri)"
+            return layer
+        if kind == "nasa":
+            provider = basemaps.NASAGIBS.BlueMarble
+            return TileLayer(url=provider.build_url(), base=True, name="NASA Blue Marble (respaldo)",
+                attribution=provider.html_attribution, min_zoom=0, max_zoom=20,
+                max_native_zoom=provider.max_zoom)
+        raise ValueError("Mapa base no admitido")
+
+    def _on_basemap(self, change):
+        layer = self._make_basemap(change["new"])
+        self.map.substitute(self._basemap_layer, layer)
+        self.map.basemap = layer
+        self._basemap_layer = layer
 
     def _replace_data(self, features):
         self._updating = True

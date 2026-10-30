@@ -1,0 +1,40 @@
+{
+  "state": "passed",
+  "reported_failure": "OSM community tiles returned403 in the notebook",
+  "default_basemap": "Esri.WorldImagery",
+  "alternatives": [
+    "Esri.WorldTopoMap",
+    "NASAGIBS.BlueMarble"
+  ],
+  "http_checks": [
+    {
+      "provider": "Esri.WorldImagery",
+      "status": 200,
+      "content_type": "image/jpeg",
+      "bytes": 12515
+    },
+    {
+      "provider": "Esri.WorldTopoMap",
+      "status": 200,
+      "content_type": "image/jpeg",
+      "bytes": 16852
+    },
+    {
+      "provider": "NASAGIBS.BlueMarble",
+      "status": 200,
+      "content_type": "image/jpeg",
+      "bytes": 11146
+    }
+  ],
+  "local_jupyter_browser_satellite_loaded": true,
+  "local_jupyter_browser_nasa_tiles_loaded": true,
+  "selected_bbox_preserved_after_switching": true,
+  "software_tests": {
+    "passed": 177,
+    "skipped": 3
+  },
+  "new_nisar_downloads": 0,
+  "earthdata_credentials_used_for_basemaps": false,
+  "model_checkpoints_changed": false,
+  "hosted_colab_ui_manually_tested": false
+}
